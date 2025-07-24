@@ -22,7 +22,6 @@ class WeatherRepositoryImpl(
             if (response.isSuccessful) {
                 response.body() ?: throw Exception("Resposta da API veio nula")
             } else {
-                // Log detalhado do erro
                 Log.e("WeatherRepository", "Erro código: ${response.code()}")
                 Log.e("WeatherRepository", "Erro body: ${response.errorBody()?.string()}")
                 throw Exception("Erro da API: ${response.code()}")
