@@ -25,7 +25,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        
+
         buildConfigField(
             "String",
             "OPEN_WEATHER_API_KEY",
@@ -97,6 +97,7 @@ dependencies {
 
     // Hilt (DI)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
 
     // Room (banco de dados)
