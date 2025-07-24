@@ -1,9 +1,5 @@
 package com.example.climafy.di
 
-import com.example.climafy.data.remote.WeatherApi
-import com.example.climafy.data.repository.WeatherRepositoryImpl
-import com.example.climafy.domain.repository.WeatherRepository
-import com.example.climafy.domain.usecase.GetWeatherUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,23 +21,5 @@ object AppModule {
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideWeatherApi(retrofit: Retrofit): WeatherApi {
-        return retrofit.create(WeatherApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideWeatherRepository(api: WeatherApi): WeatherRepository {
-        return WeatherRepositoryImpl(api)
-    }
-
-    @Provides
-    @Singleton
-    fun provideGetWeatherUseCase(repository: WeatherRepository): GetWeatherUseCase {
-        return GetWeatherUseCase(repository)
     }
 }
