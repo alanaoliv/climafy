@@ -1,9 +1,10 @@
 package com.example.climafy.presentation.state
 
-import com.example.climafy.data.remote.dto.WeatherResponse
+import com.example.climafy.domain.model.Weather
 
-data class WeatherUiState(
-    val isLoading: Boolean = false,
-    val weather: WeatherResponse? = null,
-    val error: String? = null
-)
+sealed class WeatherUiState {
+    object Loading : WeatherUiState()
+    data class Success(val weather: Weather) : WeatherUiState()
+    data class Error(val message: String) : WeatherUiState()
+    object Empty : WeatherUiState()
+}

@@ -83,6 +83,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.mockk)
 
     // Retrofit + Gson
     implementation(libs.retrofit)
@@ -104,4 +106,5 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+    implementation(kotlin("test"))
 }

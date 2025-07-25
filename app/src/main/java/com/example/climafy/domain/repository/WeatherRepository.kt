@@ -1,7 +1,7 @@
 package com.example.climafy.domain.repository
 
-import com.example.climafy.data.remote.dto.WeatherResponse
+import com.example.climafy.domain.model.Weather
 
 interface WeatherRepository {
-    suspend fun getWeatherByCity(city: String): WeatherResponse
+    suspend fun getWeatherByCity(city: String): Weather
 }

@@ -2,15 +2,16 @@ package com.example.climafy.data.repository
 
 import android.util.Log
 import com.example.climafy.BuildConfig
+import com.example.climafy.data.mapper.toDomain
 import com.example.climafy.data.remote.WeatherApi
-import com.example.climafy.data.remote.dto.WeatherResponse
+import com.example.climafy.domain.model.Weather
 import com.example.climafy.domain.repository.WeatherRepository
 
 class WeatherRepositoryImpl(
     private val api: WeatherApi
 ) : WeatherRepository {
 
-    override suspend fun getWeatherByCity(city: String): WeatherResponse {
+    override suspend fun getWeatherByCity(city: String): Weather {
         return try {
             val response = api.getWeatherByCity(
                 city = city,
@@ -20,7 +21,8 @@ class WeatherRepositoryImpl(
             )
 
             if (response.isSuccessful) {
-                response.body() ?: throw Exception("Resposta da API veio nula")
+                val body = response.body() ?: throw Exception("Resposta da API veio nula")
+                body.toDomain() // ⬅️ converte WeatherResponse → Weather
             } else {
                 Log.e("WeatherRepository", "Erro código: ${response.code()}")
                 Log.e("WeatherRepository", "Erro body: ${response.errorBody()?.string()}")

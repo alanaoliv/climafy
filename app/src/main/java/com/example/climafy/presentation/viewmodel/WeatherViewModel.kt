@@ -15,18 +15,18 @@ class WeatherViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase
 ) : ViewModel() {
 
-    private val _uiState = mutableStateOf(WeatherUiState())
+    private val _uiState = mutableStateOf<WeatherUiState>(WeatherUiState.Empty)
     val uiState: State<WeatherUiState> = _uiState
 
     fun buscarClima(cidade: String) {
         viewModelScope.launch {
-            _uiState.value = WeatherUiState(isLoading = true)
+            _uiState.value = WeatherUiState.Loading
 
             try {
                 val resultado = getWeatherUseCase(cidade)
-                _uiState.value = WeatherUiState(weather = resultado)
+                _uiState.value = WeatherUiState.Success(resultado)
             } catch (e: Exception) {
-                _uiState.value = WeatherUiState(error = e.message)
+                _uiState.value = WeatherUiState.Error(e.message ?: "Erro desconhecido")
             }
         }
     }
