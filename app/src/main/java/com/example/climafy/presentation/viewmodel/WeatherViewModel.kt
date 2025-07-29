@@ -11,14 +11,17 @@ import com.example.climafy.presentation.state.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import com.example.climafy.domain.repository.FavoriteCityRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
 
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
-    private val favoriteCityDao: FavoriteCityDao
+    private val favoriteCityDao: FavoriteCityDao,
+    private val favoriteCityRepository: FavoriteCityRepository
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf<WeatherUiState>(WeatherUiState.Empty)
@@ -37,6 +40,3 @@ class WeatherViewModel @Inject constructor(
         }
     }
 }
-
-
-

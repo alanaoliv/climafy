@@ -11,6 +11,8 @@ import android.app.Application
 import androidx.room.Room
 import com.example.climafy.data.local.WeatherDatabase
 import com.example.climafy.data.local.dao.FavoriteCityDao
+import com.example.climafy.data.repository.FavoriteCityRepositoryImpl
+import com.example.climafy.domain.repository.FavoriteCityRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -42,4 +44,13 @@ object AppModule {
     fun provideFavoriteCityDao(db: WeatherDatabase): FavoriteCityDao {
         return db.favoriteCityDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteCityRepository(
+        dao: FavoriteCityDao
+    ): FavoriteCityRepository {
+        return FavoriteCityRepositoryImpl(dao)
+    }
+
 }
