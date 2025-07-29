@@ -1,5 +1,9 @@
 package com.example.climafy.presentation.viewmodel
 
+import com.example.climafy.data.local.dao.FavoriteCityDao
+import com.example.climafy.data.local.entity.FavoriteCityEntity
+import kotlinx.coroutines.flow.first
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.climafy.domain.usecase.GetWeatherUseCase
@@ -10,9 +14,11 @@ import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val getWeatherUseCase: GetWeatherUseCase
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val favoriteCityDao: FavoriteCityDao
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf<WeatherUiState>(WeatherUiState.Empty)
@@ -31,3 +37,6 @@ class WeatherViewModel @Inject constructor(
         }
     }
 }
+
+
+

@@ -7,6 +7,10 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import android.app.Application
+import androidx.room.Room
+import com.example.climafy.data.local.WeatherDatabase
+import com.example.climafy.data.local.dao.FavoriteCityDao
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -21,5 +25,21 @@ object AppModule {
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatabase(app: Application): WeatherDatabase {
+        return Room.databaseBuilder(
+            app,
+            WeatherDatabase::class.java,
+            "climafy_db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteCityDao(db: WeatherDatabase): FavoriteCityDao {
+        return db.favoriteCityDao()
     }
 }
