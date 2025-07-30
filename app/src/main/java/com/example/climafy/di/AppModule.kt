@@ -13,6 +13,10 @@ import com.example.climafy.data.local.WeatherDatabase
 import com.example.climafy.data.local.dao.FavoriteCityDao
 import com.example.climafy.data.repository.FavoriteCityRepositoryImpl
 import com.example.climafy.domain.repository.FavoriteCityRepository
+import com.example.climafy.domain.usecase.favorite.DeletarCidadeFavoritaUseCase
+import com.example.climafy.domain.usecase.favorite.FavoriteUseCases
+import com.example.climafy.domain.usecase.favorite.InserirCidadeFavoritaUseCase
+import com.example.climafy.domain.usecase.favorite.ListarCidadesFavoritasUseCase
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -51,6 +55,15 @@ object AppModule {
         dao: FavoriteCityDao
     ): FavoriteCityRepository {
         return FavoriteCityRepositoryImpl(dao)
+    }
+    @Provides
+    @Singleton
+    fun provideFavoriteUseCases(repository: FavoriteCityRepository): FavoriteUseCases {
+        return FavoriteUseCases(
+            inserirCidadeFavoritaUseCase = InserirCidadeFavoritaUseCase(repository),
+            listarCidadesFavoritasUseCase = ListarCidadesFavoritasUseCase(repository),
+            deletarCidadeFavoritaUseCase = DeletarCidadeFavoritaUseCase(repository)
+        )
     }
 
 }
