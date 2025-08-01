@@ -17,7 +17,7 @@ fun WeatherCard(weather: Weather) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "🌆 ${weather.city}",
+                text = "🌆 ${weather.city}, ${weather.country}",
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
