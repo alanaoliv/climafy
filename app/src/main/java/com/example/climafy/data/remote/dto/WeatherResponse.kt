@@ -4,7 +4,8 @@ data class WeatherResponse(
     val name: String,
     val weather: List<Weather>,
     val main: Main,
-    val wind: Wind
+    val wind: Wind,
+    val sys: SysDto
 )
 
 data class Weather(
@@ -19,4 +20,8 @@ data class Main(
 
 data class Wind(
     val speed: Double
+)
+
+data class SysDto(
+    val country: String
 )
