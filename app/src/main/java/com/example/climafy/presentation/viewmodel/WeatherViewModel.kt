@@ -18,6 +18,7 @@ import com.example.climafy.domain.usecase.favorite.FavoriteUseCases
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,6 +31,9 @@ class WeatherViewModel @Inject constructor(
     private val favoriteCityRepository: FavoriteCityRepository,
     private var weatherRepository: WeatherRepository
 ) : ViewModel() {
+
+    private val _mensagemErro = mutableStateOf<String?>(null)
+    val mensagemErro: State<String?> = _mensagemErro
 
     private val _uiState = mutableStateOf<WeatherUiState>(WeatherUiState.Empty)
     val uiState: State<WeatherUiState> = _uiState
@@ -47,14 +51,23 @@ class WeatherViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("WeatherViewModel", "Erro ao buscar clima: ${e.message}", e)
 
-                weatherRepository.obterUltimoClima().collectLatest { weather ->
-                    weather?.let {
-                        Log.d("Offline", "Mostrando clima salvo: ${weather.city}")
-                        _uiState.value = WeatherUiState.Success(it)
-                    } ?: run {
-                        val mensagemClara = tratarMensagemDeErro(e)
-                        _uiState.value = WeatherUiState.Error(mensagemClara)
-                    }
+                val weather = try {
+                    weatherRepository.obterUltimoClima().firstOrNull()
+                } catch (ex: Exception) {
+                    null
+                }
+
+                if (weather != null) {
+                    Log.d("Offline", "Mostrando clima salvo: ${weather.city}")
+                    _uiState.value = WeatherUiState.Success(weather)
+
+                    val mensagemClara = tratarMensagemDeErro(e)
+                    _mensagemErro.value = mensagemClara
+
+                } else {
+                    val mensagemClara = tratarMensagemDeErro(e)
+                    _uiState.value = WeatherUiState.Error(mensagemClara)
+                    _mensagemErro.value = mensagemClara
                 }
             }
 
@@ -94,17 +107,32 @@ class WeatherViewModel @Inject constructor(
     }
 
     private fun tratarMensagemDeErro(e: Exception): String {
+        val mensagem = e.message?.lowercase() ?: ""
+
         return when {
-            e.message?.contains("Unable to resolve host", ignoreCase = true) == true -> {
+            mensagem.contains("unable to resolve host") ||
+                    mensagem.contains("failed to connect") ||
+                    mensagem.contains("no address associated") -> {
                 "Sem conexão com a internet. Verifique sua rede."
             }
-            e.message?.contains("404", ignoreCase = true) == true -> {
+
+            mensagem.contains("404") || mensagem.contains("not found") -> {
                 "Cidade não encontrada. Verifique o nome digitado."
             }
+
+            mensagem.contains("timeout") -> {
+                "Tempo de conexão esgotado. Tente novamente."
+            }
+
             else -> {
                 "Erro ao buscar clima. Tente novamente mais tarde."
             }
         }
+    }
+
+
+    fun resetarMensagemErro() {
+        _mensagemErro.value = null
     }
 
 }

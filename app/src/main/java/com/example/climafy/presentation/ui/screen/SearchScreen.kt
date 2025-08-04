@@ -8,6 +8,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,65 +47,91 @@ fun SearchScreen(
 ) {
     val uiState = weatherViewModel.uiState.value
     var cidade by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val mensagemErro by weatherViewModel.mensagemErro
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "Climafy",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        OutlinedTextField(
-            value = cidade,
-            onValueChange = { cidade = it },
-            label = { Text("Digite o nome da cidade") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = { weatherViewModel.buscarClima(cidade) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Buscar")
+    LaunchedEffect(mensagemErro) {
+        mensagemErro?.let {
+            Log.d("SearchScreen", "Mensagem de erro: $it")
+            snackbarHostState.showSnackbar(it)
+            weatherViewModel.resetarMensagemErro()
         }
+    }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = { navController.navigate("favorites") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Ver Favoritos")
-        }
-
-        when (val state = uiState) {
-            is WeatherUiState.Loading -> {
-                CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(16.dp)
+            ){ data ->
+                Snackbar(
+                    snackbarData = data
+                )
             }
-            is WeatherUiState.Success -> {
-                Column {
-                    WeatherCard(weather = state.weather)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { weatherViewModel.favoritarCidade(state.weather) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Favoritar cidade")
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Text(
+                text = "Climafy",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            OutlinedTextField(
+                value = cidade,
+                onValueChange = { cidade = it },
+                label = { Text("Digite o nome da cidade") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { weatherViewModel.buscarClima(cidade) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Buscar")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = { navController.navigate("favorites") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ver Favoritos")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            when (val state = uiState) {
+                is WeatherUiState.Loading -> {
+                    CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+                }
+
+                is WeatherUiState.Success -> {
+                    Column {
+                        WeatherCard(weather = state.weather)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = { weatherViewModel.favoritarCidade(state.weather) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Favoritar cidade")
+                        }
                     }
                 }
-            }
 
-            is WeatherUiState.Error -> {
-                Text("Erro: ${state.message}")
-            }
-            is WeatherUiState.Empty -> {
-                Text("Digite uma cidade e clique em Buscar")
+                is WeatherUiState.Empty -> {
+                    Text("Digite uma cidade e clique em Buscar")
+                }
+                else -> Unit
             }
         }
     }

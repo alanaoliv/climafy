@@ -39,7 +39,7 @@ class WeatherRepositoryImpl(
 
         } catch (e: Exception) {
             Log.e("WeatherRepository", "Erro real: ${e.message}", e)
-            throw Exception("Erro ao obter dados do clima")
+            throw e
         }
     }
 
