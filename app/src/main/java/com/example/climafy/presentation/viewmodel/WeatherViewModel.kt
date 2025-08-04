@@ -13,6 +13,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.example.climafy.domain.model.Weather
 import com.example.climafy.domain.repository.FavoriteCityRepository
+import com.example.climafy.domain.repository.WeatherRepository
 import com.example.climafy.domain.usecase.favorite.FavoriteUseCases
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +27,8 @@ import java.util.Locale
 class WeatherViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val favoriteUseCases: FavoriteUseCases,
-    private val favoriteCityRepository: FavoriteCityRepository
+    private val favoriteCityRepository: FavoriteCityRepository,
+    private var weatherRepository: WeatherRepository
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf<WeatherUiState>(WeatherUiState.Empty)
@@ -39,11 +41,26 @@ class WeatherViewModel @Inject constructor(
             try {
                 val resultado = getWeatherUseCase(cidade)
                 _uiState.value = WeatherUiState.Success(resultado)
+
+                weatherRepository.salvarUltimoClima(resultado)
+
             } catch (e: Exception) {
-                _uiState.value = WeatherUiState.Error(e.message ?: "Erro desconhecido")
+
+                weatherRepository.obterUltimoClima().collectLatest { weather ->
+                    weather?.let {
+
+                        Log.d("Offline", "Mostrando clima salvo: ${weather?.city}")
+
+                        _uiState.value = WeatherUiState.Success(it)
+
+                    } ?: run {
+                        _uiState.value = WeatherUiState.Error(e.message ?: "Erro ${e.message}")
+                    }
+                }
             }
         }
     }
+
 
     fun favoritarCidade(weather: Weather) {
         viewModelScope.launch {

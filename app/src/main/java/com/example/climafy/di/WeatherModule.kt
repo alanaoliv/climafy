@@ -1,5 +1,7 @@
 package com.example.climafy.di
 
+import com.example.climafy.data.local.WeatherDatabase
+import com.example.climafy.data.local.dao.LastWeatherDao
 import com.example.climafy.data.remote.WeatherApi
 import com.example.climafy.data.repository.WeatherRepositoryImpl
 import com.example.climafy.domain.repository.WeatherRepository
@@ -23,13 +25,22 @@ object WeatherModule {
 
     @Provides
     @Singleton
-    fun provideWeatherRepository(api: WeatherApi): WeatherRepository {
-        return WeatherRepositoryImpl(api)
+    fun provideWeatherRepository(
+        api: WeatherApi,
+        lastWeatherDao: LastWeatherDao
+    ): WeatherRepository {
+        return WeatherRepositoryImpl(api, lastWeatherDao)
     }
 
     @Provides
     @Singleton
     fun provideGetWeatherUseCase(repository: WeatherRepository): GetWeatherUseCase {
         return GetWeatherUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLastWeatherDao(db: WeatherDatabase): LastWeatherDao {
+        return db.lastWeatherDao()
     }
 }
