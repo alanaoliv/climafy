@@ -45,20 +45,21 @@ class WeatherViewModel @Inject constructor(
                 weatherRepository.salvarUltimoClima(resultado)
 
             } catch (e: Exception) {
+                Log.e("WeatherViewModel", "Erro ao buscar clima: ${e.message}", e)
 
                 weatherRepository.obterUltimoClima().collectLatest { weather ->
                     weather?.let {
-
-                        Log.d("Offline", "Mostrando clima salvo: ${weather?.city}")
-
+                        Log.d("Offline", "Mostrando clima salvo: ${weather.city}")
                         _uiState.value = WeatherUiState.Success(it)
-
                     } ?: run {
-                        _uiState.value = WeatherUiState.Error(e.message ?: "Erro ${e.message}")
+                        val mensagemClara = tratarMensagemDeErro(e)
+                        _uiState.value = WeatherUiState.Error(mensagemClara)
                     }
                 }
             }
+
         }
+
     }
 
 
@@ -91,5 +92,20 @@ class WeatherViewModel @Inject constructor(
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return formatter.format(Date())
     }
+
+    private fun tratarMensagemDeErro(e: Exception): String {
+        return when {
+            e.message?.contains("Unable to resolve host", ignoreCase = true) == true -> {
+                "Sem conexão com a internet. Verifique sua rede."
+            }
+            e.message?.contains("404", ignoreCase = true) == true -> {
+                "Cidade não encontrada. Verifique o nome digitado."
+            }
+            else -> {
+                "Erro ao buscar clima. Tente novamente mais tarde."
+            }
+        }
+    }
+
 }
 
