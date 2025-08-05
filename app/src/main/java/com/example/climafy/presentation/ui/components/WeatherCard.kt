@@ -10,6 +10,12 @@ import com.example.climafy.domain.model.Weather
 @Composable
 fun WeatherCard(weather: Weather) {
     Card(
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor =
+            if (weather.temperature > 25) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.secondary
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),

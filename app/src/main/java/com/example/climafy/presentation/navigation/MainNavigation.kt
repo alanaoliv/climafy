@@ -6,15 +6,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.climafy.presentation.ui.screen.FavoriteScreen
 import com.example.climafy.presentation.ui.screen.SearchScreen
+import com.example.climafy.presentation.viewmodel.ThemeViewModel
 
 @Composable
-fun MainNavigation(navController: NavHostController) {
+fun MainNavigation(
+    navController: NavHostController,
+    themeViewModel: ThemeViewModel
+    ) {
     NavHost(navController = navController, startDestination = "search") {
         composable("search") {
-            SearchScreen(navController = navController)
+            SearchScreen(
+                navController = navController,
+                themeViewModel = themeViewModel
+            )
         }
         composable("favorites") {
-            FavoriteScreen()
+            FavoriteScreen(
+                themeViewModel = themeViewModel
+            )
         }
     }
 }

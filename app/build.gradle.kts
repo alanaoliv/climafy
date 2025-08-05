@@ -15,12 +15,12 @@ val localProperties = Properties().apply {
 
 android {
     namespace = "com.example.climafy"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.climafy"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.text.google.fonts)
 
     // Testes
     testImplementation(libs.junit)

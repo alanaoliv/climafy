@@ -21,6 +21,7 @@ import com.example.climafy.data.remote.WeatherApiService
 import com.example.climafy.data.repository.WeatherRepositoryImpl
 import com.example.climafy.domain.usecase.GetWeatherUseCase
 import com.example.climafy.presentation.navigation.MainNavigation
+import com.example.climafy.presentation.ui.ClimafyApp
 import com.example.climafy.presentation.ui.screen.SearchScreen
 import com.example.climafy.presentation.viewmodel.WeatherViewModel
 import com.example.climafy.ui.theme.ClimafyTheme
@@ -33,10 +34,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ClimafyTheme {
-                val navController = rememberNavController()
-                MainNavigation(navController = navController)
-            }
+            ClimafyApp()
         }
     }
 }

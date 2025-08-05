@@ -21,17 +21,32 @@ fun FavoriteCityItem(
     onDeletar: () -> Unit
 ) {
     Card(
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Cidade: ${cidade.cityName}, ${cidade.country}", style = MaterialTheme.typography.bodyLarge)
-            Text("Temperatura: ${cidade.temperature}°C", style = MaterialTheme.typography.bodyMedium)
-            Text("Descrição: ${cidade.description}", style = MaterialTheme.typography.bodyMedium)
+            Text("Cidade: ${cidade.cityName}, ${cidade.country}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text("Temperatura: ${cidade.temperature}°C",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text("Descrição: ${cidade.description}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onDeletar) {
+            Button(
+                onClick = onDeletar
+            ) {
                 Text("Deletar")
             }
         }
