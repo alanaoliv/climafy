@@ -14,6 +14,7 @@ import javax.inject.Inject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
@@ -40,30 +41,26 @@ class FavoriteViewModel @Inject constructor(
     }
 
     init {
-        atualizarFavoritosAoIniciar()
-    }
-
-    private fun atualizarFavoritosAoIniciar() {
         viewModelScope.launch {
-            favoriteUseCases.listarCidadesFavoritasUseCase().collect { lista ->
-                lista.forEach { cidade ->
-                    try {
-                        val novoClima = getWeatherUseCase(cidade.cityName)
-                        val cidadeAtualizada = cidade.copy(
-                            temperature = novoClima.temperature,
-                            description = novoClima.description,
-                            icon = novoClima.icon,
-                            date = getCurrentDate()
-                        )
-                        favoriteUseCases.inserirCidadeFavoritaUseCase(cidadeAtualizada)
-                        Log.d("FavoriteViewModel", "Atualizado: ${cidade.cityName}")
-                    } catch (e: Exception) {
-                        Log.e("FavoriteViewModel", "Erro ao atualizar ${cidade.cityName}", e)
-                    }
+            val listaInicial = favoriteUseCases.listarCidadesFavoritasUseCase().first() // Pega apenas o primeiro valor (a lista atual)
+            listaInicial.forEach { cidade ->
+                try {
+                    val novoClima = getWeatherUseCase(cidade.cityName)
+                    val cidadeAtualizada = cidade.copy(
+                        temperature = novoClima.temperature,
+                        description = novoClima.description,
+                        icon = novoClima.icon,
+                        date = getCurrentDate()
+                    )
+                    favoriteUseCases.inserirCidadeFavoritaUseCase(cidadeAtualizada)
+                    Log.d("FavoriteViewModel", "Atualizado ao iniciar: ${cidade.cityName}")
+                } catch (e: Exception) {
+                    Log.e("FavoriteViewModel", "Erro ao atualizar ${cidade.cityName} ao iniciar", e)
                 }
             }
         }
     }
+
 
     private fun getCurrentDate(): String {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
