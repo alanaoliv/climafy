@@ -40,9 +40,9 @@ class FavoriteViewModel @Inject constructor(
         }
     }
 
-    init {
+    fun atualizarClimasFavoritos() {
         viewModelScope.launch {
-            val listaInicial = favoriteUseCases.listarCidadesFavoritasUseCase().first() // Pega apenas o primeiro valor (a lista atual)
+            val listaInicial = favoriteUseCases.listarCidadesFavoritasUseCase().first()
             listaInicial.forEach { cidade ->
                 try {
                     val novoClima = getWeatherUseCase(cidade.cityName)
@@ -53,9 +53,9 @@ class FavoriteViewModel @Inject constructor(
                         date = getCurrentDate()
                     )
                     favoriteUseCases.inserirCidadeFavoritaUseCase(cidadeAtualizada)
-                    Log.d("FavoriteViewModel", "Atualizado ao iniciar: ${cidade.cityName}")
+                    Log.d("FavoriteViewModel", "Atualizado: ${cidade.cityName}")
                 } catch (e: Exception) {
-                    Log.e("FavoriteViewModel", "Erro ao atualizar ${cidade.cityName} ao iniciar", e)
+                    Log.e("FavoriteViewModel", "Erro ao atualizar ${cidade.cityName}", e)
                 }
             }
         }
