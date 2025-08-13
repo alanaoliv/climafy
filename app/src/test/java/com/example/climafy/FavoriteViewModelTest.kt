@@ -1,7 +1,6 @@
-package com.example.climafy.presentation.viewmodel
+package com.example.climafy
 
 import android.util.Log
-import com.example.climafy.MainDispatcherRule
 import com.example.climafy.data.local.entity.FavoriteCityEntity
 import com.example.climafy.domain.model.Weather
 import com.example.climafy.domain.usecase.GetWeatherUseCase
@@ -9,6 +8,7 @@ import com.example.climafy.domain.usecase.favorite.DeletarCidadeFavoritaUseCase
 import com.example.climafy.domain.usecase.favorite.FavoriteUseCases
 import com.example.climafy.domain.usecase.favorite.InserirCidadeFavoritaUseCase
 import com.example.climafy.domain.usecase.favorite.ListarCidadesFavoritasUseCase
+import com.example.climafy.presentation.viewmodel.FavoriteViewModel
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
@@ -34,7 +34,7 @@ class FavoriteViewModelTest {
 
     @Before
     fun setUp() {
-        // Evita "Method Log.d/e not mocked" em testes unitários
+
         mockkStatic(Log::class)
         every { Log.d(any(), any()) } returns 0
         every { Log.e(any(), any(), any()) } returns 0
@@ -87,8 +87,7 @@ class FavoriteViewModelTest {
 
         val vm = createViewModel(listaFake)
 
-        // O StateFlow criado com stateIn emite primeiro o valor inicial (emptyList).
-        // Por isso usamos drop(1) para pegar a primeira emissão "real".
+
         val result = vm.favoritos.drop(1).first()
 
         assertEquals(listaFake, result)
@@ -158,7 +157,7 @@ class FavoriteViewModelTest {
         vm.atualizarClimasFavoritos()
         advanceUntilIdle()
 
-        // Verifica que salvou as versões atualizadas (ignorando a data)
+
         coVerify {
             inserirUC.invoke(match {
                 it.cityName == "Recife" &&
