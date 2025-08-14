@@ -5,7 +5,6 @@ import com.example.climafy.BuildConfig
 import com.example.climafy.data.local.dao.LastWeatherDao
 import com.example.climafy.data.local.entity.LastWeatherEntity
 import com.example.climafy.data.mapper.toDomain
-import com.example.climafy.data.remote.WeatherApi
 import com.example.climafy.domain.model.Weather
 import com.example.climafy.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +14,7 @@ import java.util.Date
 import java.util.Locale
 
 class WeatherRepositoryImpl(
-    private val api: WeatherApi,
+    private val api: com.example.climafy.data.remote.WeatherApi,
     private val lastWeatherDao: LastWeatherDao
 ) : WeatherRepository {
 
@@ -23,17 +22,14 @@ class WeatherRepositoryImpl(
         return try {
             val response = api.getWeatherByCity(
                 city = city,
-                apiKey = BuildConfig.OPEN_WEATHER_API_KEY,
-                units = "metric",
-                language = "pt_br"
+                apiKey = BuildConfig.OPEN_WEATHER_API_KEY
             )
 
             if (response.isSuccessful) {
                 val body = response.body() ?: throw Exception("Resposta da API veio nula")
                 body.toDomain()
             } else {
-                Log.e("WeatherRepository", "Erro código: ${response.code()}")
-                Log.e("WeatherRepository", "Erro body: ${response.errorBody()?.string()}")
+                Log.e("WeatherRepository", "Erro código: ${response.code()} - ${response.errorBody()?.string()}")
                 throw Exception("Erro da API: ${response.code()}")
             }
 
@@ -44,32 +40,38 @@ class WeatherRepositoryImpl(
     }
 
     override suspend fun salvarUltimoClima(weather: Weather) {
-        val entity = LastWeatherEntity(
-            id = 1,
-            cityName = weather.city,
-            country = weather.country,
-            temperature = weather.temperature,
-            description = weather.description,
-            icon = weather.icon,
-            date = getCurrentDate(),
-        )
-        lastWeatherDao.salvarUltimoClima(entity)
+        lastWeatherDao.salvarUltimoClima(weather.toEntity())
     }
 
-    override fun obterUltimoClima(): Flow<Weather?> = lastWeatherDao.obterUltimoClima().map { entity ->
-        entity?.let {
-            Weather(
-                city = it.cityName,
-                country = it.country,
-                temperature = it.temperature,
-                description = it.description,
-                icon = it.icon
-            )
-        }
+    override fun obterUltimoClima(): Flow<Weather?> {
+        return lastWeatherDao.obterUltimoClima().map { it?.toDomain() }
     }
+}
 
-    private fun getCurrentDate(): String {
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        return formatter.format(Date())
-    }
+
+private fun Weather.toEntity(): LastWeatherEntity {
+    return LastWeatherEntity(
+        id = 1,
+        cityName = city,
+        country = country,
+        temperature = temperature,
+        description = description,
+        icon = icon,
+        date = getCurrentDate()
+    )
+}
+
+private fun LastWeatherEntity.toDomain(): Weather {
+    return Weather(
+        city = cityName,
+        country = country,
+        temperature = temperature,
+        description = description,
+        icon = icon
+    )
+}
+
+private fun getCurrentDate(): String {
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.format(Date())
 }

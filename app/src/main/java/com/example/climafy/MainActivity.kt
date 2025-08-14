@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.example.climafy.data.remote.WeatherApiService
 import com.example.climafy.data.repository.WeatherRepositoryImpl
 import com.example.climafy.domain.usecase.GetWeatherUseCase
 import com.example.climafy.presentation.navigation.MainNavigation

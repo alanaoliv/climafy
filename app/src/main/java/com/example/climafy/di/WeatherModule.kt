@@ -1,6 +1,5 @@
 package com.example.climafy.di
 
-import com.example.climafy.data.local.WeatherDatabase
 import com.example.climafy.data.local.dao.LastWeatherDao
 import com.example.climafy.data.remote.WeatherApi
 import com.example.climafy.data.repository.WeatherRepositoryImpl
@@ -19,28 +18,21 @@ object WeatherModule {
 
     @Provides
     @Singleton
-    fun provideWeatherApi(retrofit: Retrofit): WeatherApi {
-        return retrofit.create(WeatherApi::class.java)
-    }
+    fun provideWeatherApi(retrofit: Retrofit): WeatherApi =
+        retrofit.create(WeatherApi::class.java)
 
     @Provides
     @Singleton
     fun provideWeatherRepository(
         api: WeatherApi,
         lastWeatherDao: LastWeatherDao
-    ): WeatherRepository {
-        return WeatherRepositoryImpl(api, lastWeatherDao)
-    }
+    ): WeatherRepository =
+        WeatherRepositoryImpl(api, lastWeatherDao)
 
     @Provides
     @Singleton
-    fun provideGetWeatherUseCase(repository: WeatherRepository): GetWeatherUseCase {
-        return GetWeatherUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideLastWeatherDao(db: WeatherDatabase): LastWeatherDao {
-        return db.lastWeatherDao()
-    }
+    fun provideGetWeatherUseCase(
+        repository: WeatherRepository
+    ): GetWeatherUseCase =
+        GetWeatherUseCase(repository)
 }

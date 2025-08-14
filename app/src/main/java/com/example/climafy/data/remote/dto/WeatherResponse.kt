@@ -2,13 +2,13 @@ package com.example.climafy.data.remote.dto
 
 data class WeatherResponse(
     val name: String,
-    val weather: List<Weather>,
+    val weather: List<WeatherDto>,
     val main: Main,
     val wind: Wind,
     val sys: SysDto
 )
 
-data class Weather(
+data class WeatherDto(
     val description: String,
     val icon: String
 )
