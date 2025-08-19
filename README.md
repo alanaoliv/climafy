@@ -82,5 +82,14 @@ O projeto foi construído utilizando as seguintes tecnologias:
 
 ---
 
+### 📜 Licença
+
+Este projeto está sob a licença MIT.
+Você pode usar, copiar, modificar e distribuir livremente, desde que mantenha os créditos ao autor.
+
+Para mais detalhes, veja o arquivo [LICENSE](https://github.com/alanaoliv/climafy/blob/main/LICENSE.md).
+
+---
+
 👩‍💻 Desenvolvido com 💙 por Alana
 
