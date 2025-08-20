@@ -10,7 +10,7 @@ import com.example.climafy.data.local.entity.LastWeatherEntity
 @Database(
     entities = [
         FavoriteCityEntity::class, LastWeatherEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class WeatherDatabase : RoomDatabase() {

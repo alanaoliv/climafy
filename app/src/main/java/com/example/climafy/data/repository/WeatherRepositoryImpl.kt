@@ -5,6 +5,7 @@ import com.example.climafy.BuildConfig
 import com.example.climafy.data.local.dao.LastWeatherDao
 import com.example.climafy.data.local.entity.LastWeatherEntity
 import com.example.climafy.data.mapper.toDomain
+import com.example.climafy.data.remote.WeatherApi
 import com.example.climafy.domain.model.Weather
 import com.example.climafy.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +15,7 @@ import java.util.Date
 import java.util.Locale
 
 class WeatherRepositoryImpl(
-    private val api: com.example.climafy.data.remote.WeatherApi,
+    private val api: WeatherApi,
     private val lastWeatherDao: LastWeatherDao
 ) : WeatherRepository {
 
@@ -56,6 +57,8 @@ private fun Weather.toEntity(): LastWeatherEntity {
         country = country,
         temperature = temperature,
         description = description,
+        tempMax = tempMax,
+        tempMin = tempMin,
         icon = icon,
         date = getCurrentDate()
     )
@@ -67,7 +70,9 @@ private fun LastWeatherEntity.toDomain(): Weather {
         country = country,
         temperature = temperature,
         description = description,
-        icon = icon
+        tempMax = tempMax,
+        tempMin = tempMin,
+        icon = icon,
     )
 }
 

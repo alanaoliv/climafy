@@ -3,6 +3,7 @@ package com.example.climafy.di
 import android.app.Application
 import androidx.room.Room
 import com.example.climafy.data.local.WeatherDatabase
+import com.example.climafy.data.local.WeatherMigrations.MIGRATION_1_2
 import com.example.climafy.data.local.dao.FavoriteCityDao
 import com.example.climafy.data.local.dao.LastWeatherDao
 import dagger.Module
@@ -34,7 +35,10 @@ object CoreModule {
             app,
             WeatherDatabase::class.java,
             "climafy_db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .addMigrations(MIGRATION_1_2)
+            .build()
 
     @Provides
     @Singleton

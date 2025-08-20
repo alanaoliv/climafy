@@ -82,6 +82,8 @@ class WeatherViewModel @Inject constructor(
                 cityName = weather.city,
                 country = weather.country,
                 temperature = weather.temperature,
+                tempMin = weather.tempMin,
+                tempMax = weather.tempMax,
                 description = weather.description,
                 icon = weather.icon,
                 date = getCurrentDate()
