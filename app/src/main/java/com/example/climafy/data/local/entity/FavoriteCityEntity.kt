@@ -10,6 +10,8 @@ data class FavoriteCityEntity(
     val cityName: String,
     val country: String,
     val temperature: Double,
+    val tempMin: Double?,
+    val tempMax: Double?,
     val description: String,
     val icon: String,
     val date: String

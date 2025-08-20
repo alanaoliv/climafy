@@ -9,6 +9,8 @@ fun WeatherResponse.toDomain(): Weather {
         country = sys.country,
         temperature = main.temp,
         description = weather.firstOrNull()?.description ?: "Descrição não disponível",
+        tempMax = main.temp_max,
+        tempMin = main.temp_min,
         icon = weather . firstOrNull ()?.icon ?: "",
     )
 }

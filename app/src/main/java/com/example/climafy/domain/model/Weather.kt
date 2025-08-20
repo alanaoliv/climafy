@@ -5,5 +5,7 @@ data class Weather(
     val country: String,
     val temperature: Double,
     val description: String,
+    val tempMax: Double?,
+    val tempMin: Double?,
     val icon: String
 )

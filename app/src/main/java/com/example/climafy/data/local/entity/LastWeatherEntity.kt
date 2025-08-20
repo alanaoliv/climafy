@@ -10,6 +10,8 @@ data class LastWeatherEntity(
     val cityName: String,
     val country: String,
     val temperature: Double,
+    val tempMax: Double?,
+    val tempMin: Double?,
     val description: String,
     val icon: String,
     val date: String

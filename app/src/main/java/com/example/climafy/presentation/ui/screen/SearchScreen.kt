@@ -1,15 +1,29 @@
 package com.example.climafy.presentation.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -17,29 +31,39 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.climafy.R
 import com.example.climafy.domain.model.Weather
 import com.example.climafy.presentation.state.WeatherUiState
+import com.example.climafy.presentation.ui.components.FavoriteWeatherCard
 import com.example.climafy.presentation.ui.components.WeatherCard
+import com.example.climafy.presentation.viewmodel.FavoriteViewModel
 import com.example.climafy.presentation.viewmodel.ThemeViewModel
 import com.example.climafy.presentation.viewmodel.WeatherViewModel
 import com.example.climafy.ui.theme.ClimafyTheme
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun SearchScreen(
     weatherViewModel: WeatherViewModel = hiltViewModel(),
+    favoriteViewModel: FavoriteViewModel = hiltViewModel(),
     navController: NavHostController,
     themeViewModel: ThemeViewModel
 ) {
@@ -48,6 +72,9 @@ fun SearchScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val mensagemErro by weatherViewModel.mensagemErro
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+    val favoriteCities by favoriteViewModel.favoritos.collectAsState(emptyList())
+
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(mensagemErro) {
         mensagemErro?.let {
@@ -73,119 +100,110 @@ fun SearchScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp)
                 .padding(paddingValues),
             verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = "Climafy",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            OutlinedTextField(
-                value = cidade,
-                onValueChange = { cidade = it },
-                label = { Text("Digite o nome da cidade") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { weatherViewModel.buscarClima(cidade) },
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Buscar")
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { navController.navigate("favorites") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Ver Favoritos")
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { themeViewModel.alternarTema() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (isDarkTheme) "Modo Claro" else "Modo Escuro")
-            }
-
-
-            when (val state = uiState) {
-                is WeatherUiState.Loading -> {
-                    CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+                IconButton(onClick = { themeViewModel.alternarTema() }) {
+                    Icon(
+                        painter = painterResource(id = if (isDarkTheme) R.drawable.light_mode else R.drawable.dark_mode),
+                        contentDescription = if (isDarkTheme) "Modo Claro" else "Modo Escuro",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
-
-                is WeatherUiState.Success -> {
-                    Column {
-                        WeatherCard(weather = state.weather)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = { weatherViewModel.favoritarCidade(state.weather) },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Favoritar cidade")
+                OutlinedTextField(
+                    value = cidade,
+                    onValueChange = { cidade = it },
+                    shape = RoundedCornerShape(16.dp),
+                    placeholder = { Text("Digite o nome da cidade") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                )
+                IconButton(onClick = {
+                    if (cidade.isNotBlank()) {
+                        weatherViewModel.buscarClima(cidade)
+                    } else {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Digite o nome de uma cidade")
                         }
                     }
                 }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Buscar",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            when (val state = uiState) {
+                is WeatherUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is WeatherUiState.Success -> {
+                    WeatherCard(weather = state.weather, state = state)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
                 is WeatherUiState.Empty -> {
-                    Text("Digite uma cidade e clique em Buscar")
+                    Text("Digite o nome de uma cidade e clique em Buscar")
                 }
+
                 else -> Unit
+
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (favoriteCities.isNotEmpty()) {
+                Text(
+                    text = "Cidades Favoritas",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                TextButton(
+                    onClick = { navController.navigate("favorites") },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(
+                        text = "Ver mais",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(favoriteCities) { city ->
+                        FavoriteWeatherCard(
+                            cityName = city.cityName,
+                            temperature = city.temperature,
+                            lastUpdate = city.date,
+                            description = city.description
+                        )
+                    }
+                }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchScreenPreview() {
-    ClimafyTheme {
-        var cidade by remember { mutableStateOf("São Paulo") }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            OutlinedTextField(
-                value = cidade,
-                onValueChange = { cidade = it },
-                label = { Text("Digite o nome da cidade") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-                Text("Buscar")
-            }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Cidade: $cidade")
-            Text("Temperatura: 24°C")
-            Text("Descrição: Céu limpo")
-        }
-    }
-
-
-@Preview(showBackground = true)
-@Composable
-fun WeatherCardPreview() {
-    ClimafyTheme {
-        WeatherCard(
-            weather = Weather(
-                city = "São Paulo",
-                country = "BR",
-                temperature = 24.5,
-                description = "céu limpo",
-                icon = "https://openweathermap.org/img/wn/01d@2x.png"
-            )
-        )
     }
 }
