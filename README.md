@@ -57,7 +57,7 @@ A tela inicial permite buscar uma cidade e visualizar o clima atualizado.
 - ⭐ **Favoritar cidades** → Toque no ícone de coração.  
 - 🌙 **Alternar tema** → Ícone no topo permite trocar entre modo claro e escuro.  
 
-![Demonstração](./demonstracao.gif)
+![Demonstração](./assets/demonstracao.gif)
 
 ---
 
